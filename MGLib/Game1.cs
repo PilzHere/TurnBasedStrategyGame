@@ -5,10 +5,7 @@ using LD49ogl.Screen;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.Content;
 using MonoGame.Extended.Input;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
 using screen = MGLib.Screen.Screen;
 using assMan = MGLib.AssetManager.AssetManager;
 
@@ -47,9 +44,6 @@ namespace MGLib
         private assMan _assMan;
 
         private Stack<screen> _gameScreens;
-
-        //private TiledMap _tiledMap;
-        //private TiledMapRenderer _tiledMapRenderer;
 
         public Game1(string gameTitle)
         {
@@ -140,9 +134,6 @@ namespace MGLib
                 SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
             _fboTexture = _fbo;
 
-            //_tiledMap = Content.Load<TiledMap>("Maps/map01");
-            //_tiledMapRenderer = new TiledMapRenderer(_graphics.GraphicsDevice, _tiledMap);
-
             AddScreen(new MainMenuScreen(this, _assMan, _spriteBatch, GraphicsDevice));
         }
 
@@ -216,8 +207,6 @@ namespace MGLib
 
             _gameScreens.First().Input(gameTime, _deltaTime);
             _gameScreens.First().Tick(gameTime, _deltaTime);
-
-            //_tiledMapRenderer.Update(gameTime);
 
             base.Update(gameTime);
 

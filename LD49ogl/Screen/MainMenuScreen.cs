@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Input;
-using MonoGame.Extended.Input.InputListeners;
 using MonoGame.Extended.Sprites;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
@@ -27,8 +26,6 @@ namespace LD49ogl.Screen
 
         private OrthographicCamera _camera;
 
-        private readonly KeyboardListener keyboardListener;
-
         public MainMenuScreen(Game1 game, AssetManager assMan, SpriteBatch spriteBatch, GraphicsDevice graphicsDevice) :
             base(game, assMan, spriteBatch)
         {
@@ -46,62 +43,90 @@ namespace LD49ogl.Screen
 
             var viewportAdapter = new BoxingViewportAdapter(game.Window, _graphicsDevice, 240, 160);
             _camera = new OrthographicCamera(viewportAdapter);
-
-            keyboardListener = new KeyboardListener();
         }
 
         private int camSpeed = 100;
         private Vector2 camPos;
         private Vector2 tankPos;
-        private bool upReleased;
+
+        private bool _upKeyReleased, _downKeyReleased, _leftKeyReleased, _rightKeyReleased;
+
+        private Keys _newScreenKey = Keys.R;
+        
+        // Arrow keys are not checked in WasJustReleased/WasJustPressed!
+        private Keys _moveTankUpKey = Keys.Up,
+            _moveTankDownKey = Keys.Down,
+            _moveTankLeftKey = Keys.Left,
+            _moveTankRightKey = Keys.Right;
 
         public override void Input(GameTime gt, float dt)
         {
-            keyboardListener.Update(gt);
-            
-            // chekc when up is released.
-            
-            keyboardListener.KeyTyped += (sender, args) =>
-            {
-                //Game.Window.Title = $"Key {args.Key} Pressed";
-                if (args.Key == Keys.Up)
-                {
-                    Console.WriteLine("UP");
-                    tankPos.Y--;
-                }
-            };
-
-            
+            const int oneStep = 16;
             
             float camPosNewY = 0;
             float camPosNewX = 0;
 
-            if (KeyboardExtended.GetState().IsKeyDown(Keys.R))
+            if (KeyboardExtended.GetState().IsKeyDown(_newScreenKey))
             {
                 // BUG: Should actually be executed beginning of next tick. SCENE_MANAGER? 
                 Game.AddScreen(new PlayScreen(Game, AssMan, SpriteBatch, _graphicsDevice));
             }
 
-            //TANK
-            if (KeyboardExtended.GetState().WasKeyJustDown(Keys.Up))
+            // TANK
+            if (KeyboardExtended.GetState().IsKeyUp(_moveTankUpKey))
             {
-                Console.WriteLine("UP");
-                tankPos.Y--;
+                _upKeyReleased = true;
             }
-            
-            if (KeyboardExtended.GetState().WasKeyJustDown(Keys.Down))
+
+            if (KeyboardExtended.GetState().IsKeyDown(_moveTankUpKey))
             {
-                tankPos.Y++;
+                if (_upKeyReleased)
+                {
+                    tankPos.Y -= oneStep;
+                    _upKeyReleased = false;
+                }
             }
-            
-            if (KeyboardExtended.GetState().WasKeyJustDown(Keys.Left))
+
+            if (KeyboardExtended.GetState().IsKeyUp(_moveTankDownKey))
             {
-                tankPos.X--;
+                _downKeyReleased = true;
             }
-            
-            if (KeyboardExtended.GetState().WasKeyJustDown(Keys.Right))
+
+            if (KeyboardExtended.GetState().IsKeyDown(_moveTankDownKey))
             {
-                tankPos.X++;
+                if (_downKeyReleased)
+                {
+                    tankPos.Y += oneStep;
+                    _downKeyReleased = false;
+                }
+            }
+
+            if (KeyboardExtended.GetState().IsKeyUp(_moveTankLeftKey))
+            {
+                _leftKeyReleased = true;
+            }
+
+            if (KeyboardExtended.GetState().IsKeyDown(_moveTankLeftKey))
+            {
+                if (_leftKeyReleased)
+                {
+                    tankPos.X -= oneStep;
+                    _leftKeyReleased = false;
+                }
+            }
+
+            if (KeyboardExtended.GetState().IsKeyUp(_moveTankRightKey))
+            {
+                _rightKeyReleased = true;
+            }
+
+            if (KeyboardExtended.GetState().IsKeyDown(_moveTankRightKey))
+            {
+                if (_rightKeyReleased)
+                {
+                    tankPos.X += oneStep;
+                    _rightKeyReleased = false;
+                }
             }
 
             //CAM
